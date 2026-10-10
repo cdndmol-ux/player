@@ -1,0 +1,684 @@
+/* ============================================================================
+   ============================================================================
+   main.b144fd41d286a094cb29.css
+   Player Tipoedge.com — CSS ÚNICO (corregido) — TEMA BANDERA DE RUSIA
+   ----------------------------------------------------------------------------
+   PALETA RUSA:
+   - Blanco .... #FFFFFF
+   - Azul ...... #0039A6
+   - Rojo ...... #D52B1E
+
+   ?? GUÍA DE PERSONALIZACIÓN RÁPIDA (busca estos tags):
+
+   [COLOR-1]  Barra de progreso — COLOR DE RELLENO ......... gradiente blanco/azul/rojo
+   [COLOR-2]  Barra de progreso — ALTURA .................. 6px / 8px
+   [COLOR-3]  Iconos SVG de botones (play, pause…) ........ #FFFFFF (blanco)
+   [COLOR-4]  Texto de botones (fallback) ................. #FFFFFF (blanco)
+   ============================================================================
+   ============================================================================ */
+
+
+/* ============================================================================
+   1. RESET GLOBAL
+   ============================================================================ */
+html {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-font-smoothing: subpixel-antialiased;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    -webkit-text-size-adjust: 100%;
+}
+
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+div {
+    display: block;
+}
+
+
+/* ============================================================================
+   2. CONTENEDOR EXTERNO (#player — el <div> de tu HTML)
+   ============================================================================ */
+#player {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: black;
+    overflow: hidden;
+}
+
+
+/* ============================================================================
+   3. CONTENEDOR INTERNO (#live-player — lo crea Flussonic dentro de #player)
+   ============================================================================ */
+#live-player {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: black;
+    z-index: 1;
+}
+
+
+/* ============================================================================
+   4. BARRA DE PROGRESO — COLOR DE RELLENO (BANDERA RUSA)
+   ----------------------------------------------------------------------------
+   [COLOR-1]  Gradiente horizontal: blanco ? azul ? rojo (colores rusos).
+   ? Se aplica a la barra de progreso normal Y a la barra DVR (.bar-fill-2).
+   ============================================================================ */
+.bar-fill[data-seekbar],
+.bar-fill-2[data-seekbar] {
+    background-color: #D52B1E !important; /* fallback rojo */
+    background-image: linear-gradient(
+        90deg,
+        #FFFFFF 0%,
+        #FFFFFF 33%,
+        #0039A6 33%,
+        #0039A6 66%,
+        #D52B1E 66%,
+        #D52B1E 100%
+    ) !important;                        /* [COLOR-1] bandera rusa */
+}
+
+
+/* ============================================================================
+   5. BARRA DE PROGRESO — ALTURA
+   ============================================================================ */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar] {
+    height: 6px !important;    /* [COLOR-2] ALTURA NORMAL   ? cambiar aquí */
+}
+
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-background[data-seekbar] {
+    height: 8px !important;    /* [COLOR-2] ALTURA HOVER    ? cambiar aquí */
+}
+
+
+/* ============================================================================
+   6. BOTONES — COLOR DE ICONOS SVG (BLANCO RUSO)
+   ============================================================================ */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg,
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg * {
+    fill: #FFFFFF !important;    /* [COLOR-3] blanco bandera rusa */
+    color: #FFFFFF !important;   /* [COLOR-3] blanco bandera rusa */
+}
+
+
+/* ============================================================================
+   7. BOTONES — COLOR DE TEXTO (BLANCO RUSO)
+   ============================================================================ */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button {
+    color: #FFFFFF !important;   /* [COLOR-4] blanco bandera rusa */
+}
+
+
+/* ============================================================================
+   8. BOTONES — VISIBILIDAD (Play, Pause, Fullscreen, Volumen…)
+   ============================================================================ */
+.media-control[data-media-control] .media-control-button,
+.media-control[data-media-control] [data-playpause-button],
+.media-control[data-media-control] [data-playpause],
+.media-control[data-media-control] [data-play-button] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+
+/* ============================================================================
+   9. TRANSICIONES DE CONTROLES
+   ============================================================================ */
+.media-control-background,
+.media-control-layer {
+    transition: all 1s !important;
+}
+
+
+/* ============================================================================
+   10. ERROR SCREEN / DVR
+   ============================================================================ */
+div.player-error-screen {
+    display: none !important;
+}
+
+.dvr-player-wrapper {
+    background-color: black;
+}
+
+
+/* ============================================================================
+   11. BOTONES OCULTOS EN PANTALLAS MUY ESTRECHAS (w320)
+   ============================================================================ */
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+    display: none;
+}
+
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+    display: none;
+}
+
+
+/* ============================================================================
+   12. POSTER / BOTÓN GRANDE CENTRAL DE PLAY
+   ----------------------------------------------------------------------------
+   ? z-index: 998 es el original de Flussonic.
+   ? Si algún dispositivo no ve el botón, NO bajes este número.
+   ============================================================================ */
+.player-poster[data-poster] {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    background-size: contain;
+}
+
+.player-poster.clickable {
+    cursor: pointer;
+}
+
+.player-poster:hover .play-wrapper {
+    opacity: 1;
+}
+
+.player-poster .play-wrapper {
+    width: 100%;
+    height: 25%;
+    margin: 0 auto;
+    opacity: 0.75;
+    transition: opacity 0.1s ease;
+}
+
+.player-poster .play-wrapper svg {
+    height: 100%;
+}
+
+.player-poster .play-wrapper svg path {
+    fill: #FFFFFF;   /* play central en blanco ruso */
+}
+
+
+/* ============================================================================
+   13. POSTER (variante sin [data-poster])
+   ============================================================================ */
+.player-poster {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+.player-poster.clickable {
+    cursor: pointer;
+}
+
+.player-poster:hover .play-wrapper {
+    opacity: 1;
+}
+
+.player-poster .play-wrapper {
+    width: 100%;
+    height: 25%;
+    margin: 0 auto;
+    opacity: 0.75;
+    transition: opacity 0.1s ease;
+}
+
+.player-poster .play-wrapper svg {
+    height: 100%;
+}
+
+.player-poster .play-wrapper svg path {
+    fill: #FFFFFF;   /* play central en blanco ruso */
+}
+
+
+/* ============================================================================
+   14. VIDEO POSTER WRAPPER
+   ============================================================================ */
+.video-poster-wrapper {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    left: 0;
+}
+
+.video-poster-wrapper .play-wrapper-cont {
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.video-poster-wrapper .poster-video.poster-video-canvas {
+    left: -10000px;
+    top: -10000px;
+}
+
+.video-poster-wrapper .poster-video {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+}
+
+.video-poster-wrapper .poster-video.visible {
+    opacity: 1;
+}
+
+.video-poster-wrapper .poster-hid {
+    display: none;
+}
+
+
+/* ============================================================================
+   15. LOGO
+   ============================================================================ */
+.player-logo {
+    position: absolute;
+    z-index: 1200;
+    width: 100%;
+    height: 100%;
+}
+
+.live-logo {
+    position: absolute;
+}
+
+
+/* ============================================================================
+   16. THUMBNAIL PLACEHOLDER
+   ============================================================================ */
+.thumbnail_placeholder {
+    position: absolute;
+    width: 300px;
+    height: 0;
+    bottom: 70px;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumbnail_placeholder video {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.thumbnail_placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+/* ============================================================================
+   17. ECUALIZADOR  (colores bandera rusa: blanco abajo ? azul ? rojo arriba)
+   ============================================================================ */
+.equalizer {
+    position: absolute;
+    z-index: 100;
+    right: 0;
+    top: 0;
+    width: 1px;
+    height: 100%;
+}
+
+.eq-bar {
+    position: absolute;
+    bottom: 0;
+    right: 0px;
+    z-index: 100;
+    width: 0px;
+    transition: ease-in-out 25ms;
+    overflow: hidden;
+}
+
+.eq-bar-back {
+    background: linear-gradient(0deg,
+        rgba(255, 255, 255, 1) 0%,    /* blanco abajo */
+        rgba(0, 57, 166, 1) 55%,      /* azul medio */
+        rgba(213, 43, 30, 1) 100%);   /* rojo arriba */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.75;
+}
+
+
+/* ============================================================================
+   18. SUBTÍTULOS (CC)
+   ============================================================================ */
+.cc-controls[data-cc-controls] {
+    float: right;
+    position: relative;
+    display: none;
+}
+
+.cc-controls[data-cc-controls].available {
+    display: block;
+}
+
+.cc-controls[data-cc-controls] .cc-button {
+    padding: 6px !important;
+}
+
+.cc-controls[data-cc-controls] .cc-button .enabled {
+    display: block;
+    opacity: 1.0;
+}
+
+.cc-controls[data-cc-controls] .cc-button .enabled:hover {
+    opacity: 1.0;
+    text-shadow: none;
+}
+
+.cc-controls[data-cc-controls] > ul {
+    list-style-type: none;
+    position: absolute;
+    bottom: 25px;
+    border: 1px solid black;
+    display: none;
+    background-color: #e6e6e6;
+}
+
+.cc-controls[data-cc-controls] li {
+    font-size: 10px;
+}
+
+.cc-controls[data-cc-controls] li[data-title] {
+    background-color: #c3c2c2;
+    padding: 5px;
+}
+
+.cc-controls[data-cc-controls] li a {
+    color: #444;
+    padding: 2px 10px;
+    display: block;
+    text-decoration: none;
+}
+
+.cc-controls[data-cc-controls] li a:hover {
+    background-color: #0039A6;   /* azul ruso al pasar el ratón */
+    color: white;
+}
+
+.cc-controls[data-cc-controls] li a:hover a {
+    color: white;
+    text-decoration: none;
+}
+
+.cc-controls[data-cc-controls] li.current a {
+    color: #D52B1E;   /* rojo ruso para el subtítulo activo */
+}
+
+.cc-controls[data-cc-controls] .current a {
+    color: #D52B1E;
+}
+
+
+/* ============================================================================
+   19. MEDIA QUERIES — pantallas pequeñas
+   ============================================================================ */
+@media screen {
+    #live-player {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: black;
+        z-index: 1;
+    }
+
+    .dvr-player-wrapper {
+        background-color: black;
+    }
+
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+        display: none;
+    }
+
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+        display: none;
+    }
+}
+
+
+/* ============================================================================
+   20. BOTÓN "UNMUTE PLAYER" (arriba a la derecha) — TEMA BANDERA RUSA
+   ----------------------------------------------------------------------------
+   [COLOR-5]  Borde del botón ................. #FFFFFF (blanco ruso)
+   [COLOR-6]  Fondo del botón ................. gradiente azul?rojo ruso
+   [COLOR-7]  Texto e icono ................... #FFFFFF (blanco ruso)
+   [COLOR-8]  Texto al hacer hover ............ #FFFFFF (blanco ruso)
+
+   DETECCIÓN DE DISPOSITIVO:
+   ? (pointer: coarse)  ?  móvil o tablet (pantalla táctil) = BOTÓN GRANDE
+   ? (pointer: fine)    ?  PC con ratón = botón normal
+   ? portrait           ?  móvil vertical = AÚN MÁS GRANDE
+   ============================================================================ */
+
+/* ---------------------------------------------------------------------------
+   ESTILO BASE (se aplica siempre, PC y móvil)
+   --------------------------------------------------------------------------- */
+.unmute-btn {
+    position: fixed !important;
+    top: max(8px, env(safe-area-inset-top, 0px)) !important;
+    right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    z-index: 99999 !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px;
+
+    padding: 8px 12px !important;
+
+    border: 2px solid #FFFFFF !important;                       /* [COLOR-5] borde blanco ruso */
+    border-radius: 999px !important;
+
+    background: linear-gradient(135deg, #0039A6 0%, #D52B1E 100%) !important; /* [COLOR-6] azul?rojo ruso */
+    color: #FFFFFF !important;                                  /* [COLOR-7] texto blanco ruso */
+
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif !important;
+    font-weight: 400 !important;
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.3px;
+    white-space: nowrap !important;
+
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+
+    box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.15),
+        0 4px 16px rgba(0, 57, 166, 0.55);
+
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+
+    transition:
+        transform 0.15s ease,
+        background 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.25s ease;
+
+    animation: unmute-pulse 1.8s ease-in-out infinite;
+}
+
+.unmute-btn:hover,
+.unmute-btn:focus {
+    background: linear-gradient(135deg, #D52B1E 0%, #0039A6 100%) !important; /* hover invertido ruso */
+    color: #FFFFFF !important;                     /* [COLOR-8] texto blanco ruso */
+    transform: translateY(-1px) scale(1.03);
+    box-shadow:
+        0 0 0 2px rgba(255, 255, 255, 0.35),
+        0 6px 22px rgba(213, 43, 30, 0.85);
+}
+
+.unmute-btn:active {
+    transform: scale(0.96);
+}
+
+.unmute-btn svg {
+    flex: 0 0 auto !important;
+    width: 24px !important;
+    height: 24px !important;
+    fill: currentColor !important;
+    display: block !important;
+}
+
+.unmute-btn .unmute-text {
+    display: inline-block;
+}
+
+.unmute-btn.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-10px) scale(0.9);
+}
+
+@keyframes unmute-pulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.15),
+            0 4px 16px rgba(0, 57, 166, 0.45);
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(255, 255, 255, 0.35),
+            0 4px 22px rgba(213, 43, 30, 0.90);
+    }
+}
+
+
+/* ============================================================================
+   TAMAÑO EN DISPOSITIVOS TÁCTILES (móvil / tablet)
+   ============================================================================ */
+@media (pointer: coarse), (max-width: 600px) {
+    .unmute-btn {
+        padding: 19px 30px !important;
+        font-size: 16px !important;
+        gap: 14px !important;
+        border-width: 4px !important;
+        font-weight: 450 !important;
+    }
+    .unmute-btn svg {
+        width: 24px !important;
+        height: 24px !important;
+    }
+}
+
+/* ============================================================================
+   MÓVIL VERTICAL — EL TAMAÑO MÁS GRANDE
+   ============================================================================ */
+@media (pointer: coarse) and (orientation: portrait),
+       (max-width: 420px) and (orientation: portrait),
+       (max-width: 420px) and (aspect-ratio: 1/1.2) {
+    .unmute-btn {
+        padding: 8px 14px !important;
+        font-size: 16px !important;
+        gap: 16px !important;
+        border-width: 3px !important;
+        top: max(18px, env(safe-area-inset-top, 0px)) !important;
+        right: max(18px, env(safe-area-inset-right, 0px)) !important;
+    }
+    .unmute-btn svg {
+        width: 23px !important;
+        height: 23px !important;
+    }
+}
+
+/* ============================================================================
+   MÓVIL VERTICAL PEQUEÑO (ancho = 400px) — mantener tamaño grande
+   ============================================================================ */
+@media (max-width: 320px) and (orientation: portrait) {
+    .unmute-btn {
+        padding: 8px 12px !important;
+        font-size: 15px !important;
+        gap: 14px !important;
+        border-width: 3px !important;
+    }
+    .unmute-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+
+/* ============================================================================
+   MÓVIL HORIZONTAL — un poco más compacto (hay menos altura)
+   ============================================================================ */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+    .unmute-btn {
+        padding: 12px 22px !important;
+        font-size: 17px !important;
+        gap: 10px !important;
+        border-width: 2px !important;
+    }
+    .unmute-btn svg {
+        width: 22px !important;
+        height: 22px !important;
+    }
+}
+
+/* ============================================================================
+   Reducir animación si el usuario tiene "reducir movimiento" activo
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+    .unmute-btn {
+        animation: none;
+    }
+}
