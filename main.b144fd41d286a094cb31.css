@@ -1,0 +1,935 @@
+/* ============================================================================
+   ============================================================================
+   PLAYER TIPOEDGE.COM — HOJA DE ESTILOS ÚNICA
+   ----------------------------------------------------------------------------
+   Este es el ÚNICO archivo CSS que necesita el player.
+   Incluye TODO: reset, contenedores, controles, barra de progreso,
+   botón de streaming, botón de unmute y media queries.
+   NO hay CSS inline en el HTML; todo vive aquí.
+
+   ÍNDICE:
+     1.  Reset global
+     2.  Contenedores del player (#player, #live-player)
+     3.  Fondo / capa de los controles
+     4.  Botones del control (fondo, hover, iconos SVG, visibilidad)
+     5.  Barra de progreso — TRACK + FILL TRANSPARENTE
+     6.  Textos de tiempo / duración
+     7.  Transiciones generales
+     8.  Pantalla de error / DVR
+     9.  Ocultar botones en pantallas muy estrechas (w320)
+     10. Poster central (botón grande de play)
+     11. Video poster wrapper
+     12. Logo
+     13. Placeholder de thumbnail
+     14. Equalizador
+     15. Subtítulos CC
+     16. Media queries
+     17. Botón "streaming" (abre tipoedge.com en nueva pestaña)
+     18. Botón "unmute" (glassmorphism refinado)
+     19. Accesibilidad: prefers-reduced-motion
+   ============================================================================
+   ============================================================================ */
+
+
+/* ============================================================================
+   1. RESET GLOBAL
+   ----------------------------------------------------------------------------
+   Objetivo: eliminar márgenes/paddings por defecto del navegador, forzar
+   tamaño completo de la página y evitar scroll/rebotes en móvil.
+   ============================================================================ */
+
+/* html: contenedor raíz del documento. Debe ocupar 100% del viewport. */
+html {
+    /* Quita el "flash" azul al tocar enlaces/botones en móviles (iOS/Android).
+       → Si lo quitas, verás el típico rectángulo azul al pulsar. */
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+    /* Suavizado de fuentes tipo "subpixel" — mejora legibilidad en pantallas LCD.
+       → Puedes cambiarlo a 'antialiased' para un look más limpio en pantallas HiDPI. */
+    -webkit-font-smoothing: subpixel-antialiased;
+
+    /* Reset de márgenes/paddings por defecto del navegador. */
+    margin: 0;
+    padding: 0;
+
+    /* Ocupa el 100% del viewport. */
+    width: 100%;
+    height: 100%;
+
+    /* Sin scroll (evita barras de desplazamiento alrededor del player). */
+    overflow: hidden;
+}
+
+/* body: contenedor del contenido visible. */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Bloquea el scroll y los rebotes elásticos en iOS. */
+    overflow: hidden;
+
+    /* Fondo negro puro: evita "franjas blancas" si el video tarda en cargar. */
+    background-color: #000;
+
+    /* Evita que iOS cambie automáticamente el tamaño del texto (rompería el layout). */
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Universal: todos los elementos pasan a usar border-box.
+   → width/height incluyen padding + border, no se suman por fuera.
+   → Evita que el padding "desborde" el contenedor del player. */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* div: por defecto es display:block (algunos resets lo cambian; aquí lo forzamos). */
+div {
+    display: block;
+}
+
+
+/* ============================================================================
+   2. CONTENEDORES DEL PLAYER
+   ----------------------------------------------------------------------------
+   #player        → div externo (el que tú creas en el HTML).
+   #live-player   → div interno que crea Flussonic/Clappr dentro de #player.
+   Ambos deben ocupar la pantalla completa y tener fondo negro.
+   ============================================================================ */
+
+/* Contenedor externo (#player). */
+#player {
+    /* fixed + 0 en los 4 lados → ocupa toda la ventana sin importar el scroll.
+       → Los !important sobrescriben cualquier estilo que inyecte Clappr. */
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+
+    /* Refuerzo: 100% del contenedor. */
+    width: 100% !important;
+    height: 100% !important;
+
+    /* Fondo negro puro (evita destellos blancos al cargar). */
+    background-color: black;
+
+    /* Recorta cualquier cosa que sobresalga del player. */
+    overflow: hidden;
+}
+
+/* Contenedor interno (#live-player). */
+#live-player {
+    /* absolute: se posiciona respecto a #player (que ya es fixed). */
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    /* Fondo negro de respaldo. */
+    background-color: black;
+
+    /* z-index bajo: queda por debajo de los controles, poster, etc. */
+    z-index: 1;
+}
+
+
+/* ============================================================================
+   3. FONDO / CAPA DE LOS CONTROLES
+   ----------------------------------------------------------------------------
+   .media-control-background → gradiente que aparece detrás de los botones.
+   .media-control-layer      → capa contenedora de los botones.
+   Diseño: degradado TRANSPARENTE (no negro sólido), para que el video
+   se vea limpio y los controles floten suavemente encima.
+   ============================================================================ */
+
+/* Gradiente de fondo de la barra de controles. */
+.media-control-background {
+    /* Degradado vertical: opaco abajo, transparente arriba.
+       - rgba(0,0,0,0.72) = negro al 72% abajo (los botones se leen bien).
+       - rgba(0,0,0,0.40) = negro al 40% a media altura.
+       - rgba(0,0,0,0.10) = negro al 10% arriba.
+       - transparent       = se funde con el video en la parte superior.
+       → Para más contraste: sube los valores (0.85, 0.50, 0.15).
+       → Para más transparencia: baja los valores (0.55, 0.25, 0.05). */
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.72) 0%,
+        rgba(0, 0, 0, 0.40) 45%,
+        rgba(0, 0, 0, 0.10) 80%,
+        transparent 100%
+    ) !important;
+
+    /* Transición suave al aparecer/desaparecer (Clappr hace fade). */
+    transition: opacity 0.3s ease !important;
+}
+
+/* Capa de controles: sin fondo propio (solo el gradiente de arriba). */
+.media-control-layer[data-controls] {
+    background: transparent !important;
+}
+
+
+/* ============================================================================
+   4. BOTONES DEL CONTROL
+   ----------------------------------------------------------------------------
+   Todos los botones (play, pause, fullscreen, volumen, CC, etc.) usan:
+   - Fondo transparente.
+   - Icono SVG blanco.
+   - Hover: escala 1.10 + brightness 1.15 (sin fondo, sin caja).
+   ============================================================================ */
+
+/* Estado base del botón. */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button {
+    /* Sin fondo ni borde: el icono flota sobre el gradiente. */
+    background: transparent !important;
+    border: none !important;
+
+    /* Color del texto/icono por defecto. */
+    color: #ffffff !important;
+
+    /* Siempre visible (Clappr a veces lo oculta). */
+    opacity: 1 !important;
+
+    /* Animación de interacción. */
+    transition: transform 0.15s ease, filter 0.15s ease !important;
+
+    /* Sombra sutil para que se lea bien sobre fondos claros.
+       → Si quieres quitar la sombra: filter: none. */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* Hover / focus del botón (ratón, teclado o focus accesible). */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button:hover,
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button:focus {
+    /* Escala +15% de brillo al pasar el cursor.
+       → scale(1.10): +10% de tamaño.
+       → brightness(1.15): +15% de luminosidad. */
+    transform: scale(1.10);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) brightness(1.15);
+
+    /* Refuerzo: nunca añadir fondo al hacer hover. */
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Iconos SVG: forzamos blanco puro en todos los paths internos. */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg,
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg * {
+    /* fill + color cubren iconos rellenos (fill) y de trazo (stroke heredado). */
+    fill: #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Garantizar que los botones clave SIEMPRE sean visibles y clickeables.
+   → Algunas versiones de Clappr los marcan como ocultos por defecto. */
+.media-control[data-media-control] .media-control-button,
+.media-control[data-media-control] [data-playpause-button],
+.media-control[data-media-control] [data-playpause],
+.media-control[data-media-control] [data-play-button] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+
+/* ============================================================================
+   5. BARRA DE PROGRESO — TRACK + FILL TRANSPARENTE
+   ----------------------------------------------------------------------------
+   La barra consta de:
+     - .bar-background  → el "riel" o pista de fondo (la zona gris sin rellenar).
+     - .bar-fill        → la parte que se va llenando (progreso actual).
+     - .bar-fill-2      → relleno secundario (buffer / DVR).
+
+   En este tema:
+     - El TRACK es MUY sutil (casi invisible).
+     - El FILL es TRANSPARENTE (blanco translúcido, sin glow) —
+       se funde con el video en lugar de taparlo con una barra blanca sólida.
+   ============================================================================ */
+
+/* Contenedor de la barra: añade padding vertical para que sea
+   más fácil acertar con el dedo/ratón sin agrandar visualmente la barra. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] {
+    padding: 6px 0 !important;
+}
+
+/* TRACK (riel): color base y altura. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar] {
+    /* Fondo blanco MUY translúcido (casi transparente).
+       → 0.15 = 15% de opacidad. Súbelo si quieres ver mejor el riel. */
+    background-color: rgba(255, 255, 255, 0.15) !important;
+
+    /* Bordes redondeados para un look refinado. */
+    border-radius: 4px !important;
+
+    /* [ALTURA NORMAL] → grosor de la barra en reposo.
+       → Cambia 4px si la quieres más gruesa (6px, 8px...). */
+    height: 1px !important;
+
+    /* Animación suave al cambiar de estado (hover). */
+    transition: height 1s ease, background-color 01s ease !important;
+}
+
+/* TRACK en hover: se hace un poco más visible y gruesa. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-background[data-seekbar] {
+    /* [ALTURA HOVER] → grosor cuando el usuario pasa el cursor.
+       → Suele ser 1px más que la altura normal. */
+    height: 1px !important;
+
+    /* Se hace un poco más opaca al hacer hover (feedback visual). */
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* FILL (progreso): TRANSPARENTE. Solo un blanco translúcido que se
+   funde con el video, sin sombras ni glows. */
+.bar-fill[data-seekbar],
+.bar-fill-2[data-seekbar] {
+    /* Blanco translúcido (0.30 = 30% de opacidad).
+       → Ajusta la opacidad del 4º valor rgba si quieres más/menos visible:
+          - Sube a 0.45-0.55 → más visible.
+          - Baja a 0.15-0.20 → casi invisible (ultra transparente). */
+    background: rgba(255, 255, 255, 0.30) !important;
+
+    /* Bordes redondeados a juego con el track. */
+    border-radius: 4px !important;
+
+    /* Sin sombra ni glow: fondo transparente limpio (esto era lo "blanco"
+       que se veía antes; ahora es solo translúcido, sin resplandor). */
+    box-shadow: none !important;
+
+    /* Transición suave del color al pasar el ratón. */
+    transition: background 0.2s ease !important;
+}
+
+/* FILL en hover: se aclara un poco para indicar interactividad (sin glow). */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-fill[data-seekbar],
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-fill-2[data-seekbar] {
+    /* 0.45 = 45% de opacidad al hacer hover. */
+    background: rgba(255, 255, 255, 0.45) !important;
+}
+
+
+/* ============================================================================
+   6. TEXTOS DE TIEMPO / DURACIÓN
+   ----------------------------------------------------------------------------
+   Los textos como "00:15" o "LIVE" que Clappr pone junto a los controles.
+   ============================================================================ */
+
+.media-control-layer[data-controls] .media-control-button[data-time],
+.media-control-layer[data-controls] .media-control-button[data-duration],
+.media-control-layer[data-controls] [data-time] {
+    /* Fuente del sistema: se ve nativa en cada SO. */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+
+    /* Tamaño compacto: 13px. */
+    font-size: 13px !important;
+
+    /* Peso normal (ni negrita ni fina). */
+    font-weight: 400 !important;
+
+    /* Blanco al 92% de opacidad: un pelín suave, no puro blanco. */
+    color: rgba(255, 255, 255, 0.92) !important;
+
+    /* Un poco de tracking para legibilidad. */
+    letter-spacing: 0.3px !important;
+
+    /* Números de ancho fijo: evita que el texto "salte" al cambiar dígitos. */
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================================
+   7. TRANSICIONES GENERALES
+   ----------------------------------------------------------------------------
+   Suaviza la aparición/desaparición de la barra de controles al
+   mover el ratón o tocar la pantalla.
+   ============================================================================ */
+
+.media-control-background,
+.media-control-layer {
+    transition: all 0.5s ease !important;
+}
+
+
+/* ============================================================================
+   8. PANTALLA DE ERROR / DVR
+   ============================================================================ */
+
+/* Pantalla de error de Clappr: la ocultamos (el player ya reintenta solo). */
+div.player-error-screen {
+    display: none !important;
+}
+
+/* Contenedor del modo DVR: fondo negro para que no se vea el body. */
+.dvr-player-wrapper {
+    background-color: black;
+}
+
+
+/* ============================================================================
+   9. OCULTAR BOTONES EN PANTALLAS MUY ESTRECHAS (w320)
+   ----------------------------------------------------------------------------
+   Clappr añade la clase "w320" cuando el ancho es ≤320px. Aquí ocultamos
+   los botones secundarios (indicador HD y captura) para que no se amontonen.
+   ============================================================================ */
+
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+    display: none;
+}
+
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+    display: none;
+}
+
+
+/* ============================================================================
+   10. POSTER CENTRAL (botón grande de play antes de reproducir)
+   ----------------------------------------------------------------------------
+   Se muestra cuando el video aún no arrancó. z-index 998 para quedar por
+   debajo del botón de unmute (z-index 99999) pero por encima del video.
+   ============================================================================ */
+
+.player-poster[data-poster],
+.player-poster {
+    /* Centrado flexible (flexbox): el play queda perfectamente centrado. */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Ocupa todo el contenedor. */
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+    /* Capa alta: encima del video. */
+    z-index: 998;
+
+    /* Anclado arriba-izquierda (el width/height lo expande). */
+    top: 0;
+    left: 0;
+
+    /* Fondo negro: tapa el primer frame hasta que el play se pulse. */
+    background-color: #000;
+
+    /* Imagen de poster: se ajusta sin recortar. */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+/* Cursor pointer cuando el poster es clickeable. */
+.player-poster.clickable {
+    cursor: pointer;
+}
+
+/* Al hacer hover, el icono de play se ilumina al 100%. */
+.player-poster:hover .play-wrapper {
+    opacity: 1;
+}
+
+/* Icono del play central: contenedor. */
+.player-poster .play-wrapper {
+    width: 100%;
+    height: 25%;      /* Ocupa 1/4 de la altura del player. */
+    margin: 0 auto;
+    opacity: 0.75;    /* Semi-transparente en reposo. */
+    transition: opacity 0.2s ease;
+}
+
+.player-poster .play-wrapper svg {
+    height: 100%;
+}
+
+/* Color del icono de play: blanco puro. */
+.player-poster .play-wrapper svg path {
+    fill: #ffffff;
+}
+
+
+/* ============================================================================
+   11. VIDEO POSTER WRAPPER
+   ----------------------------------------------------------------------------
+   Contenedor del poster en video (cuando Clappr usa un <video> como poster
+   en vez de una imagen).
+   ============================================================================ */
+
+.video-poster-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-poster-wrapper .play-wrapper-cont {
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+/* El video poster se "aparca" fuera de la vista para precargarse. */
+.video-poster-wrapper .poster-video.poster-video-canvas {
+    left: -10000px;
+    top: -10000px;
+}
+
+.video-poster-wrapper .poster-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+}
+
+/* Cuando ya cargó, se hace visible. */
+.video-poster-wrapper .poster-video.visible {
+    opacity: 1;
+}
+
+/* Variante oculta. */
+.video-poster-wrapper .poster-hid {
+    display: none;
+}
+
+
+/* ============================================================================
+   12. LOGO
+   ----------------------------------------------------------------------------
+   El logo de la marca (si Clappr lo inyecta) va por encima del video.
+   ============================================================================ */
+
+.player-logo {
+    position: absolute;
+    z-index: 1200;   /* Por encima del poster (998). */
+    width: 100%;
+    height: 100%;
+}
+
+.live-logo {
+    position: absolute;
+}
+
+
+/* ============================================================================
+   13. PLACEHOLDER DE THUMBNAIL (vista previa al hacer seek)
+   ============================================================================ */
+
+.thumbnail_placeholder {
+    position: absolute;
+    width: 300px;
+    height: 0;
+    bottom: 70px;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumbnail_placeholder video,
+.thumbnail_placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+/* ============================================================================
+   14. ECUALIZADOR (decorativo, opcional)
+   ----------------------------------------------------------------------------
+   Barras animadas que simulan actividad de audio. Paleta azul/blanco.
+   ============================================================================ */
+
+.equalizer {
+    position: absolute;
+    z-index: 100;
+    right: 0;
+    top: 0;
+    width: 1px;
+    height: 100%;
+}
+
+.eq-bar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    width: 0;
+    transition: ease-in-out 25ms;
+    overflow: hidden;
+}
+
+/* Relleno de cada barra del ecualizador. */
+.eq-bar-back {
+    background: linear-gradient(0deg,
+        rgba(255, 255, 255, 1) 0%,       /* blanco abajo */
+        rgba(210, 225, 255, 0.95) 55%,   /* azul hielo medio */
+        rgba(160, 190, 255, 1) 100%);    /* azul más intenso arriba */
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.75;
+}
+
+
+/* ============================================================================
+   15. SUBTÍTULOS CC
+   ============================================================================ */
+
+.cc-controls[data-cc-controls] {
+    float: right;
+    position: relative;
+    display: none;        /* Oculto si no hay subtítulos disponibles. */
+}
+
+.cc-controls[data-cc-controls].available {
+    display: block;       /* Se muestra cuando Clappr detecta subtítulos. */
+}
+
+.cc-controls[data-cc-controls] .cc-button {
+    padding: 6px !important;
+}
+
+.cc-controls[data-cc-controls] .cc-button .enabled {
+    display: block;
+    opacity: 1.0;
+}
+
+/* Menú desplegable de subtítulos. */
+.cc-controls[data-cc-controls] > ul {
+    list-style-type: none;
+    position: absolute;
+    bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: none;
+    background-color: rgba(20, 20, 24, 0.96);   /* Casi negro, sutil. */
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.cc-controls[data-cc-controls] li {
+    font-size: 11px;
+}
+
+/* Cabecera del menú CC. */
+.cc-controls[data-cc-controls] li[data-title] {
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 6px 10px;
+    color: #ffffff;
+}
+
+/* Opciones del menú. */
+.cc-controls[data-cc-controls] li a {
+    color: #cfd6e0;
+    padding: 4px 12px;
+    display: block;
+    text-decoration: none;
+}
+
+.cc-controls[data-cc-controls] li a:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+/* Opción activa: azul hielo. */
+.cc-controls[data-cc-controls] li.current a {
+    color: #a8c8ff;
+}
+
+
+/* ============================================================================
+   16. MEDIA QUERIES
+   ----------------------------------------------------------------------------
+   Ajustes específicos para pantallas estrechas. Repiten los selectores de
+   arriba para asegurar prioridad en móvil.
+   ============================================================================ */
+
+@media screen {
+    #live-player {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: black;
+        z-index: 1;
+    }
+
+    .dvr-player-wrapper {
+        background-color: black;
+    }
+
+    /* Repetimos la ocultación en w320 dentro del media query. */
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+        display: none;
+    }
+
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+        display: none;
+    }
+}
+
+
+/* ============================================================================
+   17. BOTÓN "STREAMING" (abre tipoedge.com en nueva pestaña)
+   ----------------------------------------------------------------------------
+   Este botón lo inyecta el JS del HTML ANTES del botón de volumen.
+   Icono: punto central + ondas de emisión.
+   Estilo: mismo tamaño/color que el resto de iconos del control.
+   ============================================================================ */
+
+#tipoedge-stream-btn {
+    /* Layout inline-flex: el SVG queda centrado verticalmente. */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+
+    /* Sin fondo ni borde: mismo look que los demás botones del control. */
+    background: transparent !important;
+    border: none !important;
+
+    /* Cursor pointer en ratón. */
+    cursor: pointer !important;
+
+    /* Icono blanco (heredado por stroke). */
+    color: #ffffff !important;
+
+    /* Padding compacto (mismo que el resto de iconos). */
+    padding: 6px !important;
+
+    /* Sin altura extra por line-height. */
+    line-height: 0 !important;
+
+    /* Sin flash azul en móvil. */
+    -webkit-tap-highlight-color: transparent !important;
+
+    /* Transición de hover. */
+    transition: transform 0.15s ease, filter 0.15s ease !important;
+
+    /* Sombra sutil para legibilidad. */
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+/* Hover / focus del botón de streaming. */
+#tipoedge-stream-btn:hover,
+#tipoedge-stream-btn:focus {
+    /* Mismo efecto que los demás botones: +10% tamaño, +15% brillo. */
+    transform: scale(1.10);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) brightness(1.15);
+    outline: none !important;
+}
+
+/* Tamaño y color del SVG del botón. */
+#tipoedge-stream-btn svg {
+    /* [TAMAÑO ICONO STREAMING] → 20px es el tamaño típico de Clappr.
+       → Cambia a 22px si lo quieres más grande, 18px si más pequeño. */
+    width: 20px !important;
+    height: 20px !important;
+
+    display: block !important;
+
+    /* Fallback de color por si el navegador aplica fill en vez de stroke. */
+    fill: #ffffff !important;
+    color: #ffffff !important;
+
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Los paths del icono son SOLO trazo (ondas de emisión),
+   así que anulamos el fill y forzamos stroke blanco. */
+#tipoedge-stream-btn svg path {
+    fill: none !important;
+    stroke: #ffffff !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+
+/* ============================================================================
+   18. BOTÓN "UNMUTE" (glassmorphism refinado, fijo arriba a la derecha)
+   ----------------------------------------------------------------------------
+   Píldora flotante con blur. Se oculta al primer clic para no molestar.
+   ============================================================================ */
+
+.unmute-btn {
+    /* Fijo respecto al viewport (no al player). */
+    position: fixed !important;
+
+    /* Esquinas con margen de seguridad (respeta notch/islánd y barras del SO). */
+    top: max(14px, env(safe-area-inset-top, 0px)) !important;
+    right: max(14px, env(safe-area-inset-right, 0px)) !important;
+
+    /* Siempre por encima de todo (incluido el poster). */
+    z-index: 99999 !important;
+
+    /* Layout inline-flex: icono + texto alineados. */
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;        /* Separación icono ↔ texto. */
+
+    /* Padding interno. */
+    padding: 9px 16px !important;
+
+    /* Borde translúcido blanco (efecto cristal). */
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+
+    /* Forma de píldora (radius gigante). */
+    border-radius: 999px !important;
+
+    /* Fondo translúcido oscuro: deja ver el video detrás. */
+    background: rgba(15, 15, 20, 0.45) !important;
+
+    /* Texto blanco. */
+    color: #ffffff !important;
+
+    /* Tipografía del sistema para consistencia con el resto del control. */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.4px !important;
+    white-space: nowrap !important;
+
+    /* Interacción. */
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+
+    /* Sombra exterior suave. */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+
+    /* Filtro blur: esto es lo que da el efecto "cristal esmerilado". */
+    backdrop-filter: blur(12px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+
+    /* Transición suave. */
+    transition: background 0.25s ease, transform 0.2s ease,
+                border-color 0.25s ease, opacity 0.3s ease !important;
+}
+
+/* Hover / focus del botón de unmute. */
+.unmute-btn:hover,
+.unmute-btn:focus {
+    /* Fondo un poco más opaco al pasar el cursor. */
+    background: rgba(35, 35, 45, 0.65) !important;
+
+    /* Borde más visible. */
+    border-color: rgba(255, 255, 255, 0.6) !important;
+
+    /* Se eleva sutilmente. */
+    transform: translateY(-1px) scale(1.02);
+
+    color: #ffffff !important;
+}
+
+/* Al pulsar: pequeño "press". */
+.unmute-btn:active {
+    transform: scale(0.97);
+}
+
+/* Icono del botón unmute. */
+.unmute-btn svg {
+    flex: 0 0 auto !important;      /* No se encoge en flex. */
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;  /* Hereda el color del botón (blanco). */
+    display: block !important;
+}
+
+/* Texto del botón. */
+.unmute-btn .unmute-text {
+    display: inline-block;
+}
+
+/* Estado "oculto" tras pulsarlo. */
+.unmute-btn.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px) scale(0.92);
+}
+
+
+/* ----------------------------------------------------------------------------
+   18.1 AJUSTES MÓVIL / TÁCTIL DEL BOTÓN UNMUTE
+   ----------------------------------------------------------------------------
+   En pantallas táctiles (pointer:coarse) o ≤600px, el botón crece para
+   ser fácil de tocar con el dedo.
+   ---------------------------------------------------------------------------- */
+
+@media (pointer: coarse), (max-width: 600px) {
+    .unmute-btn {
+        padding: 10px 18px !important;     /* Más padding = más área táctil. */
+        font-size: 15px !important;        /* Texto ligeramente más grande. */
+        gap: 9px !important;
+    }
+
+    .unmute-btn svg {
+        width: 20px !important;            /* Icono más grande. */
+        height: 20px !important;
+    }
+}
+
+/* Móvil vertical: esquinas más retiradas del borde para respetar notch. */
+@media (pointer: coarse) and (orientation: portrait),
+       (max-width: 420px) and (orientation: portrait) {
+    .unmute-btn {
+        padding: 10px 18px !important;
+        font-size: 15px !important;
+        top: max(18px, env(safe-area-inset-top, 0px)) !important;
+        right: max(18px, env(safe-area-inset-right, 0px)) !important;
+    }
+}
+
+/* Móvil horizontal: ocupa menos altura (hay poco espacio vertical). */
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+    .unmute-btn {
+        padding: 8px 14px !important;
+        font-size: 14px !important;
+        top: max(8px, env(safe-area-inset-top, 0px)) !important;
+        right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    }
+
+    .unmute-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+
+
+/* ============================================================================
+   19. ACCESIBILIDAD: USUARIOS CON "REDUCIR MOVIMIENTO"
+   ----------------------------------------------------------------------------
+   Si el usuario tiene activada la preferencia de reducir animaciones,
+   quitamos las transiciones no esenciales (dejamos solo opacidad).
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .unmute-btn {
+        transition: opacity 0.2s ease !important;
+    }
+
+    .media-control-button {
+        transition: opacity 0.2s ease !important;
+    }
+}
