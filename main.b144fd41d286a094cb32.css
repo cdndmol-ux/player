@@ -1,0 +1,747 @@
+/* ============================================================================
+   ============================================================================
+   PLAYER TIPOEDGE.COM — HOJA DE ESTILOS ÚNICA (ESTILO YOUTUBE)
+   ----------------------------------------------------------------------------
+   Este es el ÚNICO archivo CSS que necesita el player.
+   Incluye TODO: reset, contenedores, controles, barra de progreso,
+   botón de streaming, botón de unmute y media queries.
+   NO hay CSS inline en el HTML; todo vive aquí.
+
+   ÍNDICE:
+     1.  Reset global
+     2.  Contenedores del player (#player, #live-player)
+     3.  Fondo / capa de los controles
+     4.  Botones del control (fondo, hover, iconos SVG, visibilidad)
+     5.  Barra de progreso — TRACK + FILL + SCRUBBER (ESTILO YOUTUBE)
+     6.  Textos de tiempo / duración
+     7.  Transiciones generales
+     8.  Pantalla de error / DVR
+     9.  Ocultar botones en pantallas muy estrechas (w320)
+     10. Poster central (botón grande de play)
+     11. Video poster wrapper
+     12. Logo
+     13. Placeholder de thumbnail
+     14. Equalizador
+     15. Subtítulos CC
+     16. Media queries
+     17. Botón "streaming" (abre tipoedge.com en nueva pestaña)
+     18. Botón "unmute" (glassmorphism refinado)
+     19. Accesibilidad: prefers-reduced-motion
+   ============================================================================
+   ============================================================================ */
+
+
+/* ============================================================================
+   1. RESET GLOBAL
+   ----------------------------------------------------------------------------
+   Objetivo: eliminar márgenes/paddings por defecto del navegador, forzar
+   tamaño completo de la página y evitar scroll/rebotes en móvil.
+   ============================================================================ */
+
+/* html: contenedor raíz del documento. Debe ocupar 100% del viewport. */
+html {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-font-smoothing: subpixel-antialiased;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* body: contenedor del contenido visible. */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: #000;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Universal: todos los elementos pasan a usar border-box. */
+* {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* div: por defecto es display:block. */
+div {
+    display: block;
+}
+
+
+/* ============================================================================
+   2. CONTENEDORES DEL PLAYER
+   ============================================================================ */
+
+#player {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: black;
+    overflow: hidden;
+}
+
+#live-player {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: black;
+    z-index: 1;
+}
+
+
+/* ============================================================================
+   3. FONDO / CAPA DE LOS CONTROLES
+   ----------------------------------------------------------------------------
+   Gradiente similar al de YouTube: negro más sólido en la parte inferior
+   para que los controles (especialmente la barra roja) se lean perfectamente.
+   ============================================================================ */
+
+.media-control-background {
+    /* YouTube usa un degradado de negro a transparente con mayor opacidad
+       en la zona de los controles. */
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.55) 25%,
+        rgba(0, 0, 0, 0.20) 60%,
+        transparent 100%
+    ) !important;
+
+    transition: opacity 0.3s ease !important;
+}
+
+/* Capa de controles: sin fondo propio. */
+.media-control-layer[data-controls] {
+    background: transparent !important;
+}
+
+
+/* ============================================================================
+   4. BOTONES DEL CONTROL
+   ----------------------------------------------------------------------------
+   Iconos blancos, tamaño similar al de YouTube (24px), hover con escala
+   ligera y sin fondos. YouTube usa iconos de trazo grueso y alto contraste.
+   ============================================================================ */
+
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    transition: transform 0.15s ease, filter 0.15s ease !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+    /* YouTube: iconos ligeramente más grandes y con más contraste */
+    width: auto;
+    height: auto;
+}
+
+/* Hover / focus del botón. */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button:hover,
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button:focus {
+    transform: scale(1.10);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) brightness(1.15);
+    background: transparent !important;
+    outline: none !important;
+}
+
+/* Iconos SVG: blanco puro. */
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg,
+.media-control[data-media-control] .media-control-layer[data-controls] .media-control-button svg * {
+    fill: #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* Asegurar visibilidad de botones clave. */
+.media-control[data-media-control] .media-control-button,
+.media-control[data-media-control] [data-playpause-button],
+.media-control[data-media-control] [data-playpause],
+.media-control[data-media-control] [data-play-button] {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+
+/* ============================================================================
+   5. BARRA DE PROGRESO — TRACK + FILL + SCRUBBER (ESTILO YOUTUBE)
+   ----------------------------------------------------------------------------
+   - TRACK: fondo grisáceo muy sutil.
+   - FILL: ROJO YouTube (#FF0000) sólido.
+   - BUFFER: rojo translúcido o gris claro (similar a YouTube).
+   - SCRUBBER: círculo blanco que aparece al pasar el ratón.
+   ============================================================================ */
+
+/* Contenedor de la barra: padding vertical para área táctil. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] {
+    padding: 6px 0 !important;
+}
+
+/* TRACK (riel): fondo grisáceo similar al de YouTube. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-background[data-seekbar] {
+    /* YouTube: fondo blanco translúcido (aprox. 20-25% de opacidad) */
+    background-color: rgba(255, 255, 255, 0.20) !important;
+    border-radius: 4px !important;
+    /* [ALTURA NORMAL] YouTube: 3px en reposo */
+    height: 3px !important;
+    transition: height 0.1s ease, background-color 0.1s ease !important;
+}
+
+/* TRACK en hover: se engrosa ligeramente. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-background[data-seekbar] {
+    /* [ALTURA HOVER] YouTube: ~5px al pasar el cursor */
+    height: 5px !important;
+    background-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* FILL (progreso): ROJO YouTube. */
+.bar-fill[data-seekbar],
+.bar-fill-2[data-seekbar] {
+    /* [COLOR PRINCIPAL] YouTube Red: #FF0000 */
+    background: #FF0000 !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    transition: background 0.2s ease, height 0.1s ease !important;
+}
+
+/* FILL en hover: se mantiene rojo (YouTube no cambia el color, solo engrosa). */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-fill[data-seekbar],
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-fill-2[data-seekbar] {
+    background: #FF0000 !important;
+}
+
+/* BUFFER (relleno secundario): YouTube usa un tono más claro del rojo o gris.
+   En Clappr, .bar-fill-2 suele ser el buffer. Lo hacemos ligeramente
+   transparente para diferenciarlo del progreso principal. */
+.bar-fill-2[data-seekbar] {
+    background: rgba(255, 0, 0, 0.35) !important; /* Rojo translúcido */
+    border-radius: 4px !important;
+}
+
+/* SCRUBBER (círculo de arrastre): YouTube lo muestra como un círculo blanco
+   de aprox. 12-14px que aparece al hacer hover sobre la barra. */
+.bar-scrubber[data-seekbar] {
+    background: #ffffff !important;
+    border: 2px solid #ffffff !important;
+    border-radius: 50% !important;
+    width: 13px !important;
+    height: 13px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+    /* Oculto por defecto; Clappr lo muestra en hover si está configurado */
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease !important;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Mostrar scrubber al hacer hover en la barra. */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar]:hover .bar-scrubber[data-seekbar] {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Scrubber en hover (agrandarlo ligeramente, como YouTube). */
+.media-control[data-media-control] .media-control-layer[data-controls] .bar-container[data-seekbar] .bar-scrubber[data-seekbar]:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+
+/* ============================================================================
+   6. TEXTOS DE TIEMPO / DURACIÓN
+   ----------------------------------------------------------------------------
+   YouTube usa una fuente sans-serif limpia, tamaño ~13px y color blanco.
+   ============================================================================ */
+
+.media-control-layer[data-controls] .media-control-button[data-time],
+.media-control-layer[data-controls] .media-control-button[data-duration],
+.media-control-layer[data-controls] [data-time] {
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.3px !important;
+    font-variant-numeric: tabular-nums;
+}
+
+
+/* ============================================================================
+   7. TRANSICIONES GENERALES
+   ============================================================================ */
+
+.media-control-background,
+.media-control-layer {
+    transition: all 0.5s ease !important;
+}
+
+
+/* ============================================================================
+   8. PANTALLA DE ERROR / DVR
+   ============================================================================ */
+
+div.player-error-screen {
+    display: none !important;
+}
+
+.dvr-player-wrapper {
+    background-color: black;
+}
+
+
+/* ============================================================================
+   9. OCULTAR BOTONES EN PANTALLAS MUY ESTRECHAS (w320)
+   ============================================================================ */
+
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+    display: none;
+}
+
+#live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+#player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+    display: none;
+}
+
+
+/* ============================================================================
+   10. POSTER CENTRAL (botón grande de play antes de reproducir)
+   ----------------------------------------------------------------------------
+   YouTube usa un icono de play blanco sobre un fondo rojo redondeado.
+   Ajustamos el icono a blanco y el fondo del poster a negro.
+   ============================================================================ */
+
+.player-poster[data-poster],
+.player-poster {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 998;
+    top: 0;
+    left: 0;
+    background-color: #000;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+
+.player-poster.clickable {
+    cursor: pointer;
+}
+
+.player-poster:hover .play-wrapper {
+    opacity: 1;
+}
+
+.player-poster .play-wrapper {
+    width: 100%;
+    height: 25%;
+    margin: 0 auto;
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+}
+
+.player-poster .play-wrapper svg {
+    height: 100%;
+}
+
+/* Color del icono de play: blanco puro (YouTube lo usa blanco sobre rojo). */
+.player-poster .play-wrapper svg path {
+    fill: #ffffff;
+}
+
+
+/* ============================================================================
+   11. VIDEO POSTER WRAPPER
+   ============================================================================ */
+
+.video-poster-wrapper {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-poster-wrapper .play-wrapper-cont {
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+
+.video-poster-wrapper .poster-video.poster-video-canvas {
+    left: -10000px;
+    top: -10000px;
+}
+
+.video-poster-wrapper .poster-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    opacity: 0;
+}
+
+.video-poster-wrapper .poster-video.visible {
+    opacity: 1;
+}
+
+.video-poster-wrapper .poster-hid {
+    display: none;
+}
+
+
+/* ============================================================================
+   12. LOGO
+   ============================================================================ */
+
+.player-logo {
+    position: absolute;
+    z-index: 1200;
+    width: 100%;
+    height: 100%;
+}
+
+.live-logo {
+    position: absolute;
+}
+
+
+/* ============================================================================
+   13. PLACEHOLDER DE THUMBNAIL (vista previa al hacer seek)
+   ============================================================================ */
+
+.thumbnail_placeholder {
+    position: absolute;
+    width: 300px;
+    height: 0;
+    bottom: 70px;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thumbnail_placeholder video,
+.thumbnail_placeholder img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+
+/* ============================================================================
+   14. ECUALIZADOR (decorativo, opcional)
+   ============================================================================ */
+
+.equalizer {
+    position: absolute;
+    z-index: 100;
+    right: 0;
+    top: 0;
+    width: 1px;
+    height: 100%;
+}
+
+.eq-bar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    width: 0;
+    transition: ease-in-out 25ms;
+    overflow: hidden;
+}
+
+.eq-bar-back {
+    background: linear-gradient(0deg,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(210, 225, 255, 0.95) 55%,
+        rgba(160, 190, 255, 1) 100%);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.75;
+}
+
+
+/* ============================================================================
+   15. SUBTÍTULOS CC
+   ============================================================================ */
+
+.cc-controls[data-cc-controls] {
+    float: right;
+    position: relative;
+    display: none;
+}
+
+.cc-controls[data-cc-controls].available {
+    display: block;
+}
+
+.cc-controls[data-cc-controls] .cc-button {
+    padding: 6px !important;
+}
+
+.cc-controls[data-cc-controls] .cc-button .enabled {
+    display: block;
+    opacity: 1.0;
+}
+
+.cc-controls[data-cc-controls] > ul {
+    list-style-type: none;
+    position: absolute;
+    bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    display: none;
+    background-color: rgba(20, 20, 24, 0.96);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+}
+
+.cc-controls[data-cc-controls] li {
+    font-size: 11px;
+}
+
+.cc-controls[data-cc-controls] li[data-title] {
+    background-color: rgba(255, 255, 255, 0.08);
+    padding: 6px 10px;
+    color: #ffffff;
+}
+
+.cc-controls[data-cc-controls] li a {
+    color: #cfd6e0;
+    padding: 4px 12px;
+    display: block;
+    text-decoration: none;
+}
+
+.cc-controls[data-cc-controls] li a:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+}
+
+.cc-controls[data-cc-controls] li.current a {
+    color: #a8c8ff;
+}
+
+
+/* ============================================================================
+   16. MEDIA QUERIES
+   ============================================================================ */
+
+@media screen {
+    #live-player {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: black;
+        z-index: 1;
+    }
+
+    .dvr-player-wrapper {
+        background-color: black;
+    }
+
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.media-control-button[data-hd-indicator].enabled {
+        display: none;
+    }
+
+    #live-player .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin,
+    #player     .media-control[data-media-control].w320 .media-control-layer[data-controls] button.capture-plugin {
+        display: none;
+    }
+}
+
+
+/* ============================================================================
+   17. BOTÓN "STREAMING" (abre tipoedge.com en nueva pestaña)
+   ----------------------------------------------------------------------------
+   Mantenemos el estilo original, que ya es coherente con iconos blancos.
+   ============================================================================ */
+
+#tipoedge-stream-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    color: #ffffff !important;
+    padding: 6px !important;
+    line-height: 0 !important;
+    -webkit-tap-highlight-color: transparent !important;
+    transition: transform 0.15s ease, filter 0.15s ease !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+}
+
+#tipoedge-stream-btn:hover,
+#tipoedge-stream-btn:focus {
+    transform: scale(1.10);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) brightness(1.15);
+    outline: none !important;
+}
+
+#tipoedge-stream-btn svg {
+    width: 20px !important;
+    height: 20px !important;
+    display: block !important;
+    fill: #ffffff !important;
+    color: #ffffff !important;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+#tipoedge-stream-btn svg path {
+    fill: none !important;
+    stroke: #ffffff !important;
+    stroke-width: 2 !important;
+    stroke-linecap: round !important;
+    stroke-linejoin: round !important;
+}
+
+
+/* ============================================================================
+   18. BOTÓN "UNMUTE" (glassmorphism refinado, fijo arriba a la derecha)
+   ============================================================================ */
+
+.unmute-btn {
+    position: fixed !important;
+    top: max(14px, env(safe-area-inset-top, 0px)) !important;
+    right: max(14px, env(safe-area-inset-right, 0px)) !important;
+    z-index: 99999 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 9px 16px !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    border-radius: 999px !important;
+    background: rgba(15, 15, 20, 0.45) !important;
+    color: #ffffff !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    line-height: 1 !important;
+    letter-spacing: 0.4px !important;
+    white-space: nowrap !important;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
+    backdrop-filter: blur(12px) saturate(160%) !important;
+    -webkit-backdrop-filter: blur(12px) saturate(160%) !important;
+    transition: background 0.25s ease, transform 0.2s ease,
+                border-color 0.25s ease, opacity 0.3s ease !important;
+}
+
+.unmute-btn:hover,
+.unmute-btn:focus {
+    background: rgba(35, 35, 45, 0.65) !important;
+    border-color: rgba(255, 255, 255, 0.6) !important;
+    transform: translateY(-1px) scale(1.02);
+    color: #ffffff !important;
+}
+
+.unmute-btn:active {
+    transform: scale(0.97);
+}
+
+.unmute-btn svg {
+    flex: 0 0 auto !important;
+    width: 18px !important;
+    height: 18px !important;
+    fill: currentColor !important;
+    display: block !important;
+}
+
+.unmute-btn .unmute-text {
+    display: inline-block;
+}
+
+.unmute-btn.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px) scale(0.92);
+}
+
+
+/* ----------------------------------------------------------------------------
+   18.1 AJUSTES MÓVIL / TÁCTIL DEL BOTÓN UNMUTE
+   ---------------------------------------------------------------------------- */
+
+@media (pointer: coarse), (max-width: 600px) {
+    .unmute-btn {
+        padding: 10px 18px !important;
+        font-size: 15px !important;
+        gap: 9px !important;
+    }
+
+    .unmute-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+    }
+}
+
+@media (pointer: coarse) and (orientation: portrait),
+       (max-width: 420px) and (orientation: portrait) {
+    .unmute-btn {
+        padding: 10px 18px !important;
+        font-size: 15px !important;
+        top: max(18px, env(safe-area-inset-top, 0px)) !important;
+        right: max(18px, env(safe-area-inset-right, 0px)) !important;
+    }
+}
+
+@media (pointer: coarse) and (orientation: landscape) and (max-height: 500px) {
+    .unmute-btn {
+        padding: 8px 14px !important;
+        font-size: 14px !important;
+        top: max(8px, env(safe-area-inset-top, 0px)) !important;
+        right: max(8px, env(safe-area-inset-right, 0px)) !important;
+    }
+
+    .unmute-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+
+
+/* ============================================================================
+   19. ACCESIBILIDAD: USUARIOS CON "REDUCIR MOVIMIENTO"
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+    .unmute-btn {
+        transition: opacity 0.2s ease !important;
+    }
+
+    .media-control-button {
+        transition: opacity 0.2s ease !important;
+    }
+}
